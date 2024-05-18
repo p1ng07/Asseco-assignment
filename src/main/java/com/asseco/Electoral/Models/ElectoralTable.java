@@ -1,5 +1,6 @@
 package com.asseco.Electoral.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -10,22 +11,35 @@ public class ElectoralTable {
     @GeneratedValue
     private Long id;
 
-    @NotNull(message = "Electoral table name needs to have a name identifier.")
-    @NotEmpty(message = "Name for electoral table should not be empty.")
+    @NotBlank(message = "Electoral table name needs to have a name identifier.")
     private String nameIdentifier;
 
-    @NotNull(message = "Electoral table locality needs to be defined.")
-    private LocalityOfTable locality;
+    @NotNull
+    private District district;
 
-    public Long getId() {
-        return id;
+    @NotNull
+    private Municipality municipality;
+
+    public @NotNull District getDistrict() {
+        return district;
     }
 
-    public @NotNull(message = "Electoral table locality needs to be defined.") LocalityOfTable getLocality() {
-        return locality;
+    public void setDistrict(@NotNull District district) {
+        this.district = district;
     }
 
-    public @NotNull(message = "Electoral table name needs to have a name identifier.") @NotEmpty(message = "Name for electoral table should not be empty.") String getNameIdentifier() {
+    public @NotNull Municipality getMunicipality() {
+        return municipality;
+    }
+
+    public void setMunicipality(@NotNull Municipality municipality) {
+        this.municipality = municipality;
+    }
+
+    public void setNameIdentifier(@NotBlank(message = "Electoral table name needs to have a name identifier.") String nameIdentifier) {
+        this.nameIdentifier = nameIdentifier;
+    }
+    public @NotBlank(message = "Electoral table name needs to have a name identifier.") String getNameIdentifier() {
         return nameIdentifier;
     }
 }
