@@ -1,14 +1,13 @@
 package com.asseco.Electoral.Controllers;
 
-import com.asseco.Electoral.DAO.TableDTO;
-import com.asseco.Electoral.Models.District;
+import com.asseco.Electoral.DAO.TableCreationRequest;
 import com.asseco.Electoral.Models.ElectoralTable;
-import com.asseco.Electoral.Models.Municipality;
 import com.asseco.Electoral.Repositories.ElectoralTableRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,14 +34,14 @@ public class ElectoralTableController {
     @GetMapping("/district={district}")
     @Operation(summary = "Filter electoral tables by district.",
             description = "Get all existing electoral tables in given district.")
-    public List<ElectoralTable> retrieveAllTablesByDistrict(@Valid @PathVariable District district) {
+    public List<ElectoralTable> retrieveAllTablesByDistrict(@PathVariable String district) {
         return tableRepo.findByDistrict(district);
     }
 
     @GetMapping("/municipality={municipality}")
     @Operation(summary = "Filter electoral tables by municipality.",
             description = "Get all existing electoral tables in given municipality.")
-    public List<ElectoralTable> retrieveAllTablesByMunicipality(@Valid @PathVariable Municipality municipality) {
+    public List<ElectoralTable> retrieveAllTablesByMunicipality(@PathVariable String municipality) {
         return tableRepo.findByMunicipality(municipality);
     }
 
@@ -70,20 +69,19 @@ public class ElectoralTableController {
      * Returns a Bad Request when given {@link ElectoralTable Person} is not
      * valid (see bean validation on {@link ElectoralTable Person})
      * @param request Table info to save to database
+     * @return id of created table
      */
     @PostMapping("/")
-    @Operation(summary = "Create table", description = "Create electoral table with given information.")
+    @Operation(summary = "Create table and return database id.", description = "Create electoral table with given information. District and municipality will be turned into lower case before saving to database.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Creation successful."),
+            @ApiResponse(responseCode = "200", description = "Creation successful, link of created table is returned."),
             @ApiResponse(responseCode = "400", description = "Inserted fields are not valid.")
     })
-    public void createTable(@Valid @RequestBody TableDTO request) {
-        var table = new ElectoralTable();
+    public long createTable(@Valid @RequestBody TableCreationRequest request) {
+        var table = tableFromCreationRequest(request);
 
-        table.setNameIdentifier(request.getNameIdentifier());
-        table.setMunicipality(request.getMunicipality());
-        table.setDistrict(request.getDistrict());
-        tableRepo.save(table);
+        var a = tableRepo.save(table);
+        return a.getId();
     }
 
     /**
@@ -108,9 +106,10 @@ public class ElectoralTableController {
             description = "Update the electoral table of the given id with the given values.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Updating was successful"),
-            @ApiResponse(responseCode = "400", description = "Requested table does not exist.")
+            @ApiResponse(responseCode = "404", description = "Requested table does not exist."),
+            @ApiResponse(responseCode = "400", description = "Given table to update is invalid.")
     })
-    public ResponseEntity<Object> updateTableById(@Valid @RequestBody TableDTO dto, @PathVariable long id) {
+    public ResponseEntity<Object> updateTableById(@Valid @RequestBody TableCreationRequest dto, @PathVariable long id) {
         var tableOptional = tableRepo.findById(id);
 
         // If there isn't a person with given id, return 404
@@ -118,12 +117,21 @@ public class ElectoralTableController {
             return ResponseEntity.notFound().build();
         }
         ElectoralTable tableToUpdate = tableOptional.get();
-        tableToUpdate.setDistrict(dto.getDistrict());
-        tableToUpdate.setMunicipality(dto.getMunicipality());
-        tableToUpdate.setNameIdentifier(dto.getNameIdentifier());
+
+        tableToUpdate.setDistrict(dto.getDistrict().toLowerCase().trim());
+        tableToUpdate.setMunicipality(dto.getMunicipality().toLowerCase().trim());
+        tableToUpdate.setNameIdentifier(dto.getNameIdentifier().trim());
 
         tableRepo.save(tableToUpdate);
 
         return ResponseEntity.noContent().build();
+    }
+
+    private ElectoralTable tableFromCreationRequest(TableCreationRequest request){
+        ElectoralTable table = new ElectoralTable();
+        table.setDistrict(request.getDistrict().toLowerCase().trim());
+        table.setMunicipality(request.getMunicipality().toLowerCase().trim());
+        table.setNameIdentifier(request.getNameIdentifier().trim());
+        return table;
     }
 }

@@ -13,35 +13,40 @@ public class ElectoralTable {
     @JsonSerialize
     private Long id;
 
-    @NotBlank(message = "Electoral table PersonController needs to have a PersonController identifier.")
+    @NotBlank(message = "Electoral table needs to have a name identifier.")
     private String nameIdentifier;
 
-    @NotNull
-    private District district;
+    @NotBlank(message = "Electoral table needs to have a district.")
+    private String district;
 
-    @NotNull
-    private Municipality municipality;
+    @NotBlank(message = "Electoral table needs to have a municipality.")
+    private String municipality;
 
-    public @NotNull District getDistrict() {
+    public Long getId() {
+        return id;
+    }
+
+    public @NotBlank(message = "Electoral table needs to have a name identifier.") String getNameIdentifier() {
+        return nameIdentifier;
+    }
+
+    public void setNameIdentifier(@NotBlank(message = "Electoral table needs to have a name identifier.") String nameIdentifier) {
+        this.nameIdentifier = nameIdentifier;
+    }
+
+    public @NotBlank(message = "Electoral table needs to have a district.") String getDistrict() {
         return district;
     }
 
-    public void setDistrict(@NotNull District district) {
+    public void setDistrict(@NotBlank(message = "Electoral table needs to have a district.") String district) {
         this.district = district;
     }
 
-    public @NotNull Municipality getMunicipality() {
+    public @NotBlank(message = "Electoral table needs to have a municipality.") String getMunicipality() {
         return municipality;
     }
 
-    public void setMunicipality(@NotNull Municipality municipality) {
+    public void setMunicipality(@NotBlank(message = "Electoral table needs to have a municipality.") String municipality) {
         this.municipality = municipality;
-    }
-
-    public void setNameIdentifier(@NotBlank(message = "Electoral table PersonController needs to have a PersonController identifier.") String nameIdentifier) {
-        this.nameIdentifier = nameIdentifier;
-    }
-    public @NotBlank(message = "Electoral table PersonController needs to have a PersonController identifier.") String getNameIdentifier() {
-        return nameIdentifier;
     }
 }

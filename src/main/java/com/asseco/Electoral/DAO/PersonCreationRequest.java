@@ -3,7 +3,7 @@ package com.asseco.Electoral.DAO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
-public class PersonDTO {
+public class PersonCreationRequest {
     /**
      * Full PersonController of person.
      * It can't be null, empty nor only spaces

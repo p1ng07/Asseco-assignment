@@ -55,6 +55,10 @@ public class Person {
         return citizenCardId;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public void setName(@NotNull(message = "Person needs to have a full PersonController.") String name) {
         this.name = name;
     }

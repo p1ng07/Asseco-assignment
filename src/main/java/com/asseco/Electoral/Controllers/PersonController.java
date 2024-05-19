@@ -1,7 +1,9 @@
 package com.asseco.Electoral.Controllers;
 
 import com.asseco.Electoral.DAO.AssociatePersonRequest;
-import com.asseco.Electoral.DAO.PersonDTO;
+import com.asseco.Electoral.DAO.PersonCreationRequest;
+import com.asseco.Electoral.DAO.TableCreationRequest;
+import com.asseco.Electoral.Models.ElectoralTable;
 import com.asseco.Electoral.Models.Person;
 import com.asseco.Electoral.Repositories.ElectoralTableRepository;
 import com.asseco.Electoral.Repositories.PersonRepository;
@@ -74,23 +76,21 @@ public class PersonController {
 
     /**
      * Saves a new unnafiliated (without foreign key to electoralTable) person to the database.
-     * Returns a Bad Request when given {@link PersonDTO request} is not
-     * valid (see bean validation on {@link PersonDTO request})
+     * Returns a Bad Request when given {@link PersonCreationRequest request} is not
+     * valid (see bean validation on {@link PersonCreationRequest request})
      * @param request Person info to save to database
      */
     @PostMapping("/")
-    @Operation(summary = "Create person object", description = "Add given person object to database")
+    @Operation(summary = "Create person object and return id of created person.", description = "Add given person object to database and return its internal database id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Creation was successful"),
             @ApiResponse(responseCode = "500", description = "Internal error, creation was not successful"),
             @ApiResponse(responseCode = "400", description = "User info is incorrect (age <=0, name is empty, cc id is empty)")
     })
-    public void createUnaffiliatedPerson(@Valid @RequestBody PersonDTO request) {
-        var person = new Person();
-        person.setAge(request.getAge());
-        person.setName(request.getName());
-        person.setCitizenCardId(request.getCitizenCardId());
-        personRepository.save(person);
+    public long createUnaffiliatedPerson(@Valid @RequestBody PersonCreationRequest request) {
+        var person = personFromCreationRequest(request);
+        var id = personRepository.save(person).getId();
+        return id;
     }
 
     /**
@@ -114,7 +114,7 @@ public class PersonController {
             @ApiResponse(responseCode = "204", description = "Updating was successful"),
             @ApiResponse(responseCode = "400", description = "Requested person does not exist.")
     })
-    public ResponseEntity<Object> updatePersonById(@Valid @RequestBody PersonDTO dto, @PathVariable long id) {
+    public ResponseEntity<Object> updatePersonById(@Valid @RequestBody PersonCreationRequest dto, @PathVariable long id) {
         Optional<Person> personOptional = personRepository.findById(id);
 
         // If there isn't a person with given id, return 404
@@ -151,5 +151,13 @@ public class PersonController {
         personRepository.save(personToAssociate);
 
         return ResponseEntity.ok().body("Association was successful");
+    }
+
+    private Person personFromCreationRequest(PersonCreationRequest request){
+        Person table = new Person();
+        table.setAge(request.getAge());
+        table.setName(request.getName());
+        table.setCitizenCardId(request.getCitizenCardId());
+        return table;
     }
 }
