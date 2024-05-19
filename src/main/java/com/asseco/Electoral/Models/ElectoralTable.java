@@ -1,6 +1,7 @@
 package com.asseco.Electoral.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -9,9 +10,10 @@ import jakarta.validation.constraints.*;
 public class ElectoralTable {
     @Id
     @GeneratedValue
+    @JsonSerialize
     private Long id;
 
-    @NotBlank(message = "Electoral table name needs to have a name identifier.")
+    @NotBlank(message = "Electoral table PersonController needs to have a PersonController identifier.")
     private String nameIdentifier;
 
     @NotNull
@@ -36,10 +38,10 @@ public class ElectoralTable {
         this.municipality = municipality;
     }
 
-    public void setNameIdentifier(@NotBlank(message = "Electoral table name needs to have a name identifier.") String nameIdentifier) {
+    public void setNameIdentifier(@NotBlank(message = "Electoral table PersonController needs to have a PersonController identifier.") String nameIdentifier) {
         this.nameIdentifier = nameIdentifier;
     }
-    public @NotBlank(message = "Electoral table name needs to have a name identifier.") String getNameIdentifier() {
+    public @NotBlank(message = "Electoral table PersonController needs to have a PersonController identifier.") String getNameIdentifier() {
         return nameIdentifier;
     }
 }
